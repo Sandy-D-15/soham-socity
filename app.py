@@ -33,6 +33,7 @@ from werkzeug.security import (
 
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
+from sqlalchemy import or_
 import calendar
 import os
 import uuid
@@ -60,6 +61,7 @@ from models.staff_payment import StaffPayment
 from models.vendor import Vendor
 from models.notice import Notice
 from models.complaint import Complaint
+from services.auth import validate_password_policy, clean_and_validate_mobile
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
@@ -7391,6 +7393,53 @@ with app.app_context():
         "Database tables and financial accounts ready!"
     )
 
+    bootstrap_admin_email = os.getenv("BOOTSTRAP_ADMIN_EMAIL", "").strip().lower()
+    bootstrap_admin_password = os.getenv("BOOTSTRAP_ADMIN_PASSWORD", "")
+    if bool(bootstrap_admin_email) != bool(bootstrap_admin_password):
+        raise RuntimeError(
+            "BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD must both be set."
+        )
+
+    if bootstrap_admin_email and not User.query.filter_by(role="secretary").first():
+        admin_name = os.getenv("BOOTSTRAP_ADMIN_NAME", "Society Administrator").strip()
+        admin_mobile = os.getenv("BOOTSTRAP_ADMIN_MOBILE", "9820011223").strip()
+        valid_mobile, normalized_mobile = clean_and_validate_mobile(admin_mobile)
+        if not valid_mobile:
+            raise RuntimeError(f"Invalid BOOTSTRAP_ADMIN_MOBILE: {normalized_mobile}")
+
+        valid_password, password_error = validate_password_policy(
+            bootstrap_admin_password,
+            email=bootstrap_admin_email,
+            full_name=admin_name,
+        )
+        if not valid_password:
+            raise RuntimeError(f"Invalid BOOTSTRAP_ADMIN_PASSWORD: {password_error}")
+
+        existing_user = User.query.filter(
+            or_(
+                User.email == bootstrap_admin_email,
+                User.mobile == normalized_mobile,
+            )
+        ).first()
+        if existing_user:
+            raise RuntimeError(
+                "Bootstrap admin email or mobile already belongs to another account."
+            )
+
+        bootstrap_admin = User(
+            full_name=admin_name,
+            email=bootstrap_admin_email,
+            mobile=normalized_mobile,
+            password_hash=generate_password_hash(bootstrap_admin_password),
+            role="secretary",
+            approval_status="approved",
+            is_active=True,
+            failed_attempts=0,
+            must_change_password=True,
+        )
+        db.session.add(bootstrap_admin)
+        db.session.commit()
+        print(f"Initial secretary account created for {bootstrap_admin_email}.")
 
 
 

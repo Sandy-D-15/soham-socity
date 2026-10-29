@@ -149,6 +149,8 @@ The repository includes a Render Blueprint in `render.yaml`. Create or sync a Bl
 
 After the first deploy, open the service Shell and run `python seed.py --non-interactive` once to create the initial society and secretary account. The command prints a one-time admin password; save it securely.
 
+On plans without Shell access, set `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` in the service environment before deploying. Optionally set `BOOTSTRAP_ADMIN_NAME` and `BOOTSTRAP_ADMIN_MOBILE`. The app creates an approved secretary account only when no secretary exists and requires a password change at first login.
+
 ---
 
 ## 🧪 Testing
