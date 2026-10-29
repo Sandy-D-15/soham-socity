@@ -156,7 +156,7 @@
                                     <div>{{ exp.invoice_reference or '—' }}</div>
                                     {% if exp.attachment_path %}
                                         <div style="margin-top: 4px;">
-                                            <a href="{{ url_for('static', filename=exp.attachment_path) }}" target="_blank" class="badge badge-info" style="text-decoration: none; font-size: 10px;">
+                                            <a href="{{ url_for('persistent_static', filename=exp.attachment_path) }}" target="_blank" class="badge badge-info" style="text-decoration: none; font-size: 10px;">
                                                 📎 View Bill
                                             </a>
                                         </div>

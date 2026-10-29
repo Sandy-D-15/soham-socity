@@ -143,6 +143,12 @@ society-maintenance-system/
    ```
    Navigate to `http://127.0.0.1:5000` in your web browser.
 
+### Deploying on Render
+
+The repository includes a Render Blueprint in `render.yaml`. Create or sync a Blueprint from this repository to configure the web service with Gunicorn, production settings, a generated secret key, and a persistent disk for the SQLite database and uploaded files. The persistent disk requires a paid Render service plan.
+
+After the first deploy, open the service Shell and run `python seed.py --non-interactive` once to create the initial society and secretary account. The command prints a one-time admin password; save it securely.
+
 ---
 
 ## 🧪 Testing

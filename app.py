@@ -791,7 +791,7 @@ def society_settings():
                 flash("Logo file size exceeds the 2MB limit.", "danger")
                 return redirect(url_for("society_settings"))
 
-            logo_folder = os.path.join(app.root_path, "uploads", "logos")
+            logo_folder = os.path.join(app.config["UPLOADS_DIR"], "logos")
             os.makedirs(logo_folder, exist_ok=True)
             unique_logo_name = f"{uuid.uuid4().hex}_{sec_filename}"
             logo_file.save(os.path.join(logo_folder, unique_logo_name))
@@ -815,8 +815,13 @@ def society_settings():
 
 @app.route("/society/logo/<path:filename>")
 def society_logo(filename):
-    folder = os.path.join(app.root_path, "uploads", "logos")
+    folder = os.path.join(app.config["UPLOADS_DIR"], "logos")
     return send_from_directory(folder, filename)
+
+
+@app.route("/persistent-static/<path:filename>")
+def persistent_static(filename):
+    return send_from_directory(app.config["PERSISTENT_STATIC_DIR"], filename)
 
 
 
@@ -5029,7 +5034,9 @@ def add_expense():
         allowed_exts = {'pdf', 'png', 'jpg', 'jpeg'}
         ext = receipt_file.filename.rsplit('.', 1)[-1].lower() if '.' in receipt_file.filename else ''
         if ext in allowed_exts:
-            upload_dir = os.path.join(app.root_path, "static", "uploads", "expenses")
+            upload_dir = os.path.join(
+                app.config["PERSISTENT_STATIC_DIR"], "uploads", "expenses"
+            )
             os.makedirs(upload_dir, exist_ok=True)
             filename = f"exp_{society.id}_{uuid.uuid4().hex[:10]}.{ext}"
             filepath = os.path.join(upload_dir, filename)
@@ -7082,7 +7089,9 @@ def add_notice():
         allowed_exts = {'pdf', 'png', 'jpg', 'jpeg'}
         ext = attachment_file.filename.rsplit('.', 1)[-1].lower() if '.' in attachment_file.filename else ''
         if ext in allowed_exts:
-            upload_dir = os.path.join(app.root_path, "static", "uploads", "notices")
+            upload_dir = os.path.join(
+                app.config["PERSISTENT_STATIC_DIR"], "uploads", "notices"
+            )
             os.makedirs(upload_dir, exist_ok=True)
             filename = f"notice_{society.id}_{uuid.uuid4().hex[:10]}.{ext}"
             filepath = os.path.join(upload_dir, filename)

@@ -30,7 +30,7 @@ def _get_society():
 
 
 def _get_upload_folder():
-    folder = os.path.join(current_app.root_path, "uploads", "complaints")
+    folder = os.path.join(current_app.config["UPLOADS_DIR"], "complaints")
     os.makedirs(folder, exist_ok=True)
     return folder
 

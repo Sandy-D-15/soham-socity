@@ -534,7 +534,7 @@
         <div class="brand-header">
             <div class="brand-logo-container">
                 {% if society and society.logo_filename %}
-                    <img src="{{ url_for('static', filename='uploads/' + society.logo_filename) }}" alt="Logo" class="brand-logo-img">
+                    <img src="{{ url_for('society_logo', filename=society.logo_filename) }}" alt="Logo" class="brand-logo-img">
                 {% else %}
                     <span class="brand-logo-icon">🏢</span>
                 {% endif %}
